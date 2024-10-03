@@ -1,0 +1,73 @@
+on:
+  push:
+    branches: [ "*" ]
+    tags: [ "*" ]
+  schedule:
+    - cron: "0 10 * * 1"
+
+env:
+  REGISTRY: "ghcr.io"
+  IMAGE_NAME: "${{ github.repository }}"
+  DOCKER_LAYER_CACHE: "/tmp/.buildx-cache"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        MCROUTER_UPSTREAM_IMAGE_TAG:
+          - "2023.07.17.00-1-20240929"
+          - "latest"
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DOCKER_LAYER_CACHE }}
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,event=push,enable=true,prefix=wiki-${{ matrix.MCROUTER_UPSTREAM_IMAGE_TAG }}-md-,format=short
+            type=raw,event=push,enable={{ is_default_branch }},value=wiki-${{ matrix.MCROUTER_UPSTREAM_IMAGE_TAG }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: "."
+          file: "./Dockerfile"
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64 #,linux/arm64/v8 - until we self-build or wikipedia publishes arm64 builds
+          provenance: false
+          pull: true
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            MCROUTER_UPSTREAM_IMAGE_TAG=${{ matrix.MCROUTER_UPSTREAM_IMAGE_TAG }}
+          cache-from: type=local,src=${{ env.DOCKER_LAYER_CACHE }}
+          cache-to: type=local,dest=${{ env.DOCKER_LAYER_CACHE }}
