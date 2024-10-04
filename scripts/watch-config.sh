@@ -65,7 +65,7 @@ while true; do
       successful_lookups="false"
     else
       echo "Resolved cluster pods!"
-      pools_with_cluster=$(jq -r ".pools | to_entries[] | select(.value.servers == [ \"dnssrv:\"$cluster_dnssrv ]) | .key")
+      pools_with_cluster=$(jq -r ".pools | to_entries[] | select(.value.servers == [ \"dnssrv:$cluster_dnssrv\" ]) | .key")
       for pool in $pools_with_cluster; do
         if ! jq_i ".pools.$pool = $(cat "$cluster_file")" "$conf_epoch_file"; then
           successful_lookups="false"
