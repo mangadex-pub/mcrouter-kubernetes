@@ -20,7 +20,7 @@ function jq_i() {
     mv -f "$tmpfile" "$file"
   else
     rm "$tmpfile"
-    return 1
+    exit 1
   fi
 }
 
@@ -103,21 +103,4 @@ function resolve_cluster_pods_to() {
     i=$(( i+1 ))
   done
   echo "]" | tee -a "$destination_file"
-}
-
-function are_different() {
-  local a="$1"
-  local b="$2"
-
-  if ! [ -f "$a" ] && [ -f "$b" ]; then
-    return 0
-  elif [ -f "$a" ] && ! [ -f "$b" ]; then
-    return 0
-  fi
-
-  if [ "$(sha256sum "$a" | cut -d ' ' -f1)" == "$(sha256sum "$b" | cut -d ' ' -f2)" ]; then
-    return 0
-  else
-    return 1
-  fi
 }
