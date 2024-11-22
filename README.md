@@ -1,4 +1,4 @@
-# mcrouter for Kubernetes
+# mcrouter+memcache for Kubernetes
 
 ## Summary
 
@@ -8,6 +8,8 @@ unchanging internal IP addresses.
 
 Finally, to achieve a truly dynamic setup is annoyingly verbose due to needing to regenerate JSON configuration files
 and diff them on a timer after doing a bunch of DNS lookups per memcached cluster.
+
+Overall, this stuff's a pain and this repo aims to take care of it all for use-cases similar to ours.
 
 ## Usage
 
@@ -31,7 +33,7 @@ For example, for headless service `foo-headless` in namespace `memcache`:
 
 ## Limitations
 
-1. You can have pools with static servers, but you cannot mix dynamic and static server entries in the same pool
+1. You cannot mix dynamic and static server entries in the same pool
 2. in-cluster IPv6 addressing is not supported
 3. These images are downstream
    of [Wikipedia's images of mcrouter](https://docker-registry.wikimedia.org/mcrouter/tags/), as compiling mcrouter is
