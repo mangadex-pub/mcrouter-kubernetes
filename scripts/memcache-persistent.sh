@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-TERM="${TERM:-"xterm"}"
-s_bold="$(tput bold)"
-s_normal="$(tput sgr0)"
+TP_TERM="${TERM:-"xterm"}"
+s_bold="$(tput -T "$TP_TERM" bold)"
+s_normal="$(tput -T "$TP_TERM" sgr0)"
 
 # Defaults
 MEMCACHE_BINARY_DEFAULT="$(which memcached)"
