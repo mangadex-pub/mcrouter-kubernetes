@@ -85,12 +85,15 @@ fi
 echo ""
 
 echo "*** Starting Memcache... ***"
-memcached \
-  "--memory-file=$MEMCACHE_PERSISTENCE_MEMFS_FILE" \
-  "--extended=modern" \
-  "--memory-limit=$MEMCACHE_CACHE_SIZE_MB" \
-  "--max-item-size=$MEMCACHE_ITEM_SIZE" \
-  "--lock-memory"
+(
+  set -x;
+  memcached \
+    "--memory-file=$MEMCACHE_PERSISTENCE_MEMFS_FILE" \
+    "--extended=modern" \
+    "--memory-limit=$MEMCACHE_CACHE_SIZE_MB" \
+    "--max-item-size=$MEMCACHE_ITEM_SIZE" \
+    "--lock-memory"
+)
 echo ""
 
 echo "*** Shutdown hook ***"
