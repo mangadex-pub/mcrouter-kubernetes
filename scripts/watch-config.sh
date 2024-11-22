@@ -67,7 +67,7 @@ while true; do
       pools_with_cluster=$(jq -r ".pools | to_entries[] | select(.value.servers == [ \"dnssrv:$cluster_dnssrv\" ]) | .key" "$conf_epoch_file")
       cluster_ipports_array=$(jq -c '[.[] | (.ip + ":" + (.port|tostring))]' "$cluster_file")
       for pool in $pools_with_cluster; do
-        if ! jq_i ".pools.$pool = $cluster_ipports_array" "$conf_epoch_file"; then
+        if ! jq_i ".pools.$pool.servers = $cluster_ipports_array" "$conf_epoch_file"; then
           successful_lookups="false"
         fi
       done
