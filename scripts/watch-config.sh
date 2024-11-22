@@ -45,7 +45,15 @@ for template_cluster_rline in $template_clusters_raw; do
 done
 echo ""
 
-while true; do
+wants_exit=false
+
+function exit_next {
+  echo "Received exit signal. Exiting at the end of current loop."
+  wants_exit=true
+}
+trap exit_next SIGTERM
+
+while ! $wants_exit; do
   echo "checking clusters..."
 
   workdir="$(mktemp -d)"

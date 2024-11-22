@@ -7,6 +7,7 @@ RUN apt -y update && \
     apt -y install --no-install-recommends \
       dnsutils \
       jq \
+      procps \
       vim && \
     apt -y autoremove && \
     rm -rf /var/cache/*
