@@ -4,9 +4,12 @@ FROM docker-registry.wikimedia.org/mcrouter:${MCROUTER_UPSTREAM_IMAGE_TAG} AS up
 USER root
 RUN apt -y update && \
     apt -y dist-upgrade && \
+    apt -y install --no-install-recommends apt-utils && \
     apt -y install --no-install-recommends \
       dnsutils \
       jq \
+      memcached \
+      netcat-traditional \
       procps \
       vim && \
     apt -y autoremove && \
