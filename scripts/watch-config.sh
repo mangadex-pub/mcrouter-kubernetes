@@ -6,7 +6,7 @@ SCRIPTDIR="$(dirname "$0")"
 source "$SCRIPTDIR/lib.sh"
 
 CONFIG_TEMPLATE="${1:-${CONFIG_TEMPLATE:-"/config/config.tpl.json"}}"
-CONFIG_OUTPUT="${CONFIG_OUTPUT:-"/config/config.json"}"
+CONFIG_OUTPUT="${2:-${CONFIG_OUTPUT:-"/config/config.json"}}"
 WATCH_INTERVAL_SECONDS="${WATCH_INTERVAL_SECONDS:-5}"
 
 echo "----------------------------------"
@@ -65,8 +65,9 @@ while true; do
     else
       echo "  < $(jq -c . "$cluster_file")"
       pools_with_cluster=$(jq -r ".pools | to_entries[] | select(.value.servers == [ \"dnssrv:$cluster_dnssrv\" ]) | .key" "$conf_epoch_file")
+      cluster_ipports_array=$(jq -c '[.[] | (.ip + ":" + (.port|tostring))]' "$cluster_file")
       for pool in $pools_with_cluster; do
-        if ! jq_i ".pools.$pool = $(cat "$cluster_file")" "$conf_epoch_file"; then
+        if ! jq_i ".pools.$pool = $cluster_ipports_array" "$conf_epoch_file"; then
           successful_lookups="false"
         fi
       done
