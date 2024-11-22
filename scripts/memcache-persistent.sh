@@ -7,6 +7,7 @@ normal=$(tput sgr0)
 
 # Defaults
 MEMCACHE_BINARY_DEFAULT="$(which memcached)"
+MEMCACHE_LISTEN_PORT_DEFAULT="11211"
 MEMCACHE_CACHE_SIZE_MB_DEFAULT="128"
 MEMCACHE_ITEM_SIZE_DEFAULT="8m"
 MEMCACHE_PERSISTENCE_FILE_NAME_DEFAULT="memory_file"
@@ -15,6 +16,7 @@ MEMCACHE_PERSISTENCE_MEMFS_DIR_DEFAULT="/cache/memfs"
 
 # Input envvars
 MEMCACHE_BINARY="${MEMCACHE_BINARY:-"$MEMCACHE_BINARY_DEFAULT"}"
+MEMCACHE_LISTEN_PORT="${MEMCACHE_LISTEN_PORT:-"$MEMCACHE_LISTEN_PORT_DEFAULT"}"
 MEMCACHE_CACHE_SIZE_MB="${MEMCACHE_CACHE_SIZE_MB:-"$MEMCACHE_CACHE_SIZE_MB_DEFAULT"}"
 MEMCACHE_ITEM_SIZE="${MEMCACHE_ITEM_SIZE:-"$MEMCACHE_ITEM_SIZE_DEFAULT"}"
 MEMCACHE_PERSISTENCE_FILE_NAME="${MEMCACHE_PERSISTENCE_FILE_NAME:-"$MEMCACHE_PERSISTENCE_FILE_NAME_DEFAULT"}"
@@ -32,6 +34,9 @@ function help {
   echo "  ${bold}MEMCACHE_BINARY${normal}"
   echo "    Path to the memcache binary to use instead of default one by PATH"
   echo "    Default: $MEMCACHE_BINARY_DEFAULT"
+  echo "  ${bold}MEMCACHE_LISTEN_PORT${normal}"
+  echo "    Port to listen on as per \"-p\" server argument"
+  echo "    Default: $MEMCACHE_LISTEN_PORT_DEFAULT"
   echo "  ${bold}MEMCACHE_CACHE_SIZE_MB${normal}"
   echo "    memcache cache size as per memory-limit argument (megabytes)"
   echo "    Default: $MEMCACHE_CACHE_SIZE_MB_DEFAULT"
