@@ -2,10 +2,6 @@
 
 set -euo pipefail
 
-TP_TERM="${TERM:-"xterm"}"
-s_bold="$(tput -T "$TP_TERM" bold)"
-s_normal="$(tput -T "$TP_TERM" sgr0)"
-
 # Defaults
 MEMCACHE_BINARY_DEFAULT="$(which memcached)"
 MEMCACHE_LISTEN_PORT_DEFAULT="11211"
@@ -32,27 +28,27 @@ function help {
   echo "Usage: $0"
   echo ""
   echo "Traditional memcache-related environment variables"
-  echo "  ${s_bold}MEMCACHE_BINARY${s_normal}"
+  echo "  MEMCACHE_BINARY"
   echo "    Path to the memcache binary to use instead of default one by PATH"
   echo "    Default: $MEMCACHE_BINARY_DEFAULT"
-  echo "  ${s_bold}MEMCACHE_LISTEN_PORT${s_normal}"
+  echo "  MEMCACHE_LISTEN_PORT"
   echo "    Port to listen on as per \"-p\" server argument"
   echo "    Default: $MEMCACHE_LISTEN_PORT_DEFAULT"
-  echo "  ${s_bold}MEMCACHE_CACHE_SIZE_MB${s_normal}"
+  echo "  MEMCACHE_CACHE_SIZE_MB"
   echo "    memcache cache size as per memory-limit argument (megabytes)"
   echo "    Default: $MEMCACHE_CACHE_SIZE_MB_DEFAULT"
-  echo "  ${s_bold}MEMCACHE_ITEM_SIZE${s_normal}"
+  echo "  MEMCACHE_ITEM_SIZE"
   echo "    memcache maximum item size as per max-item-size argument (unit must be specified, e.g.: \"8m\")"
   echo "    Default: $MEMCACHE_ITEM_SIZE_DEFAULT"
   echo ""
   echo "Persistence related environment variables"
-  echo "  ${s_bold}MEMCACHE_PERSISTENCE_STATE_DIR${s_normal}"
+  echo "  MEMCACHE_PERSISTENCE_STATE_DIR"
   echo "    Persistent storage directory for the cache file. No trailing slash."
   echo "    Default: $MEMCACHE_PERSISTENCE_STATE_DIR_DEFAULT"
-  echo "  ${s_bold}MEMCACHE_PERSISTENCE_MEMFS_DIR${s_normal}"
+  echo "  MEMCACHE_PERSISTENCE_MEMFS_DIR"
   echo "    Runtime memory-backed directory containing the cache file. No trailing slash."
   echo "    Default: $MEMCACHE_PERSISTENCE_MEMFS_DIR_DEFAULT"
-  echo "  ${s_bold}MEMCACHE_PERSISTENCE_FILE_NAME${s_normal}"
+  echo "  MEMCACHE_PERSISTENCE_FILE_NAME"
   echo "    Name to use for the cache file within the persistence directories"
   echo "    Default: $MEMCACHE_PERSISTENCE_FILE_NAME_DEFAULT"
 }
@@ -64,8 +60,8 @@ if [ -n "$*" ]; then
   exit 1
 fi
 
-echo "$s_bold*** memcached w/ persistence ***$s_normal"
-echo "Using $s_bold$($MEMCACHE_BINARY --version | head -n1)$s_normal (at $MEMCACHE_BINARY)"
+echo "*** memcached w/ persistence ***"
+echo "Using $($MEMCACHE_BINARY --version | head -n1) (at $MEMCACHE_BINARY)"
 echo " - state file: $MEMCACHE_PERSISTENCE_STATE_FILE"
 echo " - memfs file: $MEMCACHE_PERSISTENCE_MEMFS_FILE"
 
@@ -88,7 +84,7 @@ else
 fi
 echo ""
 
-echo "$s_bold*** Starting Memcache... ***$s_normal"
+echo "*** Starting Memcache... ***"
 memcached \
   "--memory-file=$MEMCACHE_PERSISTENCE_MEMFS_FILE" \
   "--extended=modern" \
@@ -97,7 +93,7 @@ memcached \
   "--lock-memory"
 echo ""
 
-echo "$s_bold*** Shutdown hook ***$s_normal"
+echo "*** Shutdown hook ***"
 if [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE" ] && [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE.meta" ]; then
   echo "INFO: Copying preexisting cache from persistent storage to memory-based storage..."
   mv -fv "$MEMCACHE_PERSISTENCE_MEMFS_FILE"       "$MEMCACHE_PERSISTENCE_STATE_FILE"
