@@ -97,10 +97,16 @@ echo "*** Starting Memcache... ***"
 echo ""
 
 echo "*** Shutdown hook ***"
-if [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE" ] && [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE.meta" ]; then
-  echo "INFO: Copying preexisting cache from persistent storage to memory-based storage..."
+if [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE" ]; then
+  echo "INFO: Copying cache file from memory-based to persistent storage..."
   mv -fv "$MEMCACHE_PERSISTENCE_MEMFS_FILE"       "$MEMCACHE_PERSISTENCE_STATE_FILE"
-  mv -fv "$MEMCACHE_PERSISTENCE_MEMFS_FILE.meta"  "$MEMCACHE_PERSISTENCE_MEMFS_FILE.meta"
 else
   echo "WARNING: No memory-based cache file found to copy to persistent storage. Skipping."
+fi
+
+if [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE.meta" ]; then
+  echo "INFO: Copying cache metadata file from memory-based storage to persistent..."
+  mv -fv "$MEMCACHE_PERSISTENCE_MEMFS_FILE.meta"  "$MEMCACHE_PERSISTENCE_STATE_FILE.meta"
+else
+  echo "WARNING: No memory-based cache file metadata to copy back."
 fi
