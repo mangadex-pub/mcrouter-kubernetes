@@ -64,6 +64,7 @@ echo "*** memcached w/ persistence ***"
 echo "Using $($MEMCACHE_BINARY --version | head -n1) (at $MEMCACHE_BINARY)"
 echo " - state file: $MEMCACHE_PERSISTENCE_STATE_FILE"
 echo " - memfs file: $MEMCACHE_PERSISTENCE_MEMFS_FILE"
+echo ""
 
 if ! [ -d "$MEMCACHE_PERSISTENCE_STATE_DIR" ]; then
   echo "ERROR: Persistent state directory $MEMCACHE_PERSISTENCE_STATE_DIR must already exist."
@@ -75,12 +76,11 @@ if ! [ -d "$MEMCACHE_PERSISTENCE_MEMFS_DIR" ]; then
   exit 1
 fi
 
-if [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE" ] && [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE.meta" ]; then
-  echo "Moving preexisting cache from persistent storage to memory-based storage..."
-  mv -fv "$MEMCACHE_PERSISTENCE_STATE_FILE"       "$MEMCACHE_PERSISTENCE_MEMFS_FILE"
-  mv -fv "$MEMCACHE_PERSISTENCE_STATE_FILE.meta"  "$MEMCACHE_PERSISTENCE_MEMFS_FILE.meta"
+if ! [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE" ]; then
+  echo "No preexisting cache data to restore..."
 else
-  echo "No preexisting cache file"
+  echo "Moving preexisting cache data to memory directory..."
+  find "$MEMCACHE_PERSISTENCE_STATE_DIR" -type f -exec mv -fv {} "$MEMCACHE_PERSISTENCE_MEMFS_DIR/" \;
 fi
 echo ""
 
@@ -97,16 +97,10 @@ echo "*** Starting Memcache... ***"
 echo ""
 
 echo "*** Shutdown hook ***"
-if [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE" ]; then
-  echo "INFO: Copying cache file from memory-based to persistent storage..."
-  mv -fv "$MEMCACHE_PERSISTENCE_MEMFS_FILE"       "$MEMCACHE_PERSISTENCE_STATE_FILE"
+if ! [ -f "$MEMCACHE_PERSISTENCE_MEMFS_FILE" ]; then
+  echo "No cache data to save..."
 else
-  echo "WARNING: No memory-based cache file found to copy to persistent storage. Skipping."
+  echo "Moving cache data to persistent storage directory..."
+  find "$MEMCACHE_PERSISTENCE_MEMFS_DIR" -type f -exec mv -fv {} "$MEMCACHE_PERSISTENCE_STATE_DIR/" \;
 fi
-
-if [ -f "$MEMCACHE_PERSISTENCE_STATE_FILE.meta" ]; then
-  echo "INFO: Copying cache metadata file from memory-based storage to persistent..."
-  mv -fv "$MEMCACHE_PERSISTENCE_MEMFS_FILE.meta"  "$MEMCACHE_PERSISTENCE_STATE_FILE.meta"
-else
-  echo "WARNING: No memory-based cache file metadata to copy back."
-fi
+echo ""
