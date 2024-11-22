@@ -2,8 +2,13 @@
 
 set -euo pipefail
 
-bold=$(tput bold)
-normal=$(tput sgr0)
+if [ -n "${TERM:-}" ]; then
+  bold=$(tput bold)
+  normal=$(tput sgr0)
+else
+  bold=""
+  normal=""
+fi
 
 # Defaults
 MEMCACHE_BINARY_DEFAULT="$(which memcached)"
